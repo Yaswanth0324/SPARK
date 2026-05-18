@@ -1,0 +1,243 @@
+// =====================================================================
+// SAPT localStorage utility functions - Mock Database
+// =====================================================================
+
+import { INITIAL_USERS, INITIAL_SUBMISSIONS, INITIAL_LOGS, INITIAL_COLLEGES_DATA } from './mockData';
+
+const KEYS = {
+  USERS: 'sapt_users',
+  CURRENT_USER: 'sapt_current_user',
+  SUBMISSIONS: 'sapt_submissions',
+  LOGS: 'sapt_logs',
+  COLLEGES: 'sapt_colleges',
+  REGISTERED: 'sapt_registered',
+  THEME: 'sapt_theme',
+  DB_VERSION: 'sapt_db_version',
+};
+
+// Bump this when seed data schema changes so localStorage is refreshed
+const CURRENT_DB_VERSION = '2';
+
+// ---- INIT ----
+export const initDB = () => {
+  // Always ensure built-in accounts exist / are refreshed
+  const existingUsersRaw = localStorage.getItem(KEYS.USERS);
+  if (!existingUsersRaw) {
+    localStorage.setItem(KEYS.USERS, JSON.stringify(INITIAL_USERS));
+  } else {
+    // Merge strategy: always keep built-in admin accounts current
+    const users = JSON.parse(existingUsersRaw);
+    let changed = false;
+    INITIAL_USERS.forEach(seed => {
+      const idx = users.findIndex(u => u.id === seed.id);
+      if (idx === -1) {
+        users.push(seed);
+        changed = true;
+      } else {
+        // Overwrite to keep passwords / adminId in sync with seed
+        users[idx] = { ...seed, ...users[idx], password: seed.password, adminId: seed.adminId, role: seed.role };
+        changed = true;
+      }
+    });
+    if (changed) localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+  }
+
+  // Re-seed submissions if DB version changed
+  const storedVersion = localStorage.getItem(KEYS.DB_VERSION);
+  if (storedVersion !== CURRENT_DB_VERSION) {
+    localStorage.setItem(KEYS.SUBMISSIONS, JSON.stringify(INITIAL_SUBMISSIONS));
+    localStorage.setItem(KEYS.DB_VERSION, CURRENT_DB_VERSION);
+  } else if (!localStorage.getItem(KEYS.SUBMISSIONS)) {
+    localStorage.setItem(KEYS.SUBMISSIONS, JSON.stringify(INITIAL_SUBMISSIONS));
+  }
+  if (!localStorage.getItem(KEYS.LOGS)) {
+    localStorage.setItem(KEYS.LOGS, JSON.stringify(INITIAL_LOGS));
+  }
+  if (!localStorage.getItem(KEYS.COLLEGES)) {
+    localStorage.setItem(KEYS.COLLEGES, JSON.stringify(INITIAL_COLLEGES_DATA));
+  }
+  if (!localStorage.getItem(KEYS.REGISTERED)) {
+    localStorage.setItem(KEYS.REGISTERED, 'true'); // pre-seeded = registered
+  }
+};
+
+// ---- USERS ----
+export const getUsers = () => JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
+export const saveUsers = (users) => localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+
+export const getUserById = (id) => getUsers().find(u => u.id === id) || null;
+export const getUsersByRole = (role) => getUsers().filter(u => u.role === role);
+
+export const addUser = (user) => {
+  const users = getUsers();
+  users.push(user);
+  saveUsers(users);
+};
+
+export const updateUser = (id, updates) => {
+  const users = getUsers().map(u => u.id === id ? { ...u, ...updates } : u);
+  saveUsers(users);
+  // Also update current session if it's the same user
+  const current = getCurrentUser();
+  if (current && current.id === id) {
+    localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify({ ...current, ...updates }));
+  }
+};
+
+export const isEmailRegistered = (email) => getUsers().some(u => u.email === email);
+
+// ---- AUTH ----
+export const getCurrentUser = () => {
+  const data = localStorage.getItem(KEYS.CURRENT_USER);
+  return data ? JSON.parse(data) : null;
+};
+
+export const setCurrentUser = (user) => {
+  localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(user));
+};
+
+export const clearCurrentUser = () => {
+  localStorage.removeItem(KEYS.CURRENT_USER);
+};
+
+export const login = (email, password, role) => {
+  const e = email.trim().toLowerCase();
+  const p = password;
+
+  // Check seed data first (always reliable)
+  const seedMatch = role
+    ? INITIAL_USERS.find(u => u.email.toLowerCase() === e && u.password === p && u.role === role)
+    : INITIAL_USERS.find(u => u.email.toLowerCase() === e && u.password === p);
+
+  if (seedMatch) {
+    setCurrentUser(seedMatch);
+    console.log('[SAPT] Login via seed:', seedMatch.role, seedMatch.email);
+    return { success: true, user: seedMatch };
+  }
+
+  // Check localStorage
+  const users = getUsers();
+  const user = role
+    ? users.find(u => u.email?.toLowerCase() === e && u.password === p && u.role === role)
+    : users.find(u => u.email?.toLowerCase() === e && u.password === p);
+
+  if (user) {
+    setCurrentUser(user);
+    console.log('[SAPT] Login via localStorage:', user.role, user.email);
+    return { success: true, user };
+  }
+
+  console.warn('[SAPT] Login failed for:', { e, role });
+  return { success: false, error: 'Invalid credentials' };
+};
+
+
+export const adminLogin = (email, password, adminId) => {
+  const e = email.trim().toLowerCase();
+  const p = password; // passwords are case-sensitive
+  const a = adminId.trim().toUpperCase();
+
+  // ---- Step 1: Always check hardcoded seed accounts first (guaranteed to work) ----
+  const seedUser = INITIAL_USERS.find(u =>
+    u.email.toLowerCase() === e &&
+    u.password === p &&
+    u.adminId?.toUpperCase() === a
+  );
+  if (seedUser) {
+    setCurrentUser(seedUser);
+    console.log('[SAPT] Admin login via seed data:', seedUser.role, seedUser.email);
+    return { success: true, user: seedUser };
+  }
+
+  // ---- Step 2: Check localStorage (for dynamically added admins) ----
+  const users = getUsers();
+  const user = users.find(u =>
+    u.email?.toLowerCase() === e &&
+    u.password === p &&
+    u.adminId?.toUpperCase() === a
+  );
+  if (user) {
+    setCurrentUser(user);
+    console.log('[SAPT] Admin login via localStorage:', user.role, user.email);
+    return { success: true, user };
+  }
+
+  console.warn('[SAPT] Admin login failed. Tried:', { e, a, usersCount: users.length });
+  return { success: false, error: 'Invalid admin credentials' };
+};
+
+
+export const logout = () => {
+  clearCurrentUser();
+};
+
+export const isRegistered = () => localStorage.getItem(KEYS.REGISTERED) === 'true';
+export const setRegistered = () => localStorage.setItem(KEYS.REGISTERED, 'true');
+
+// ---- SUBMISSIONS ----
+export const getSubmissions = () => JSON.parse(localStorage.getItem(KEYS.SUBMISSIONS) || '[]');
+export const saveSubmissions = (subs) => localStorage.setItem(KEYS.SUBMISSIONS, JSON.stringify(subs));
+
+export const getSubmissionsByStudent = (studentId) =>
+  getSubmissions().filter(s => s.studentId === studentId);
+
+export const getSubmissionsByMentor = (mentorId) =>
+  getSubmissions().filter(s => s.mentorId === mentorId);
+
+export const addSubmission = (submission) => {
+  const subs = getSubmissions();
+  subs.push(submission);
+  saveSubmissions(subs);
+};
+
+export const updateSubmission = (id, updates) => {
+  const subs = getSubmissions().map(s => s.id === id ? { ...s, ...updates } : s);
+  saveSubmissions(subs);
+};
+
+export const getTotalCredits = (studentId) => {
+  return getSubmissionsByStudent(studentId)
+    .filter(s => s.status === 'approved')
+    .reduce((sum, s) => sum + (s.credits || 0), 0);
+};
+
+// ---- LOGS ----
+export const getLogs = () => JSON.parse(localStorage.getItem(KEYS.LOGS) || '[]');
+export const saveLogs = (logs) => localStorage.setItem(KEYS.LOGS, JSON.stringify(logs));
+
+export const getLogsByStudent = (studentId) =>
+  getLogs().filter(l => l.studentId === studentId).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+export const addLog = (log) => {
+  const logs = getLogs();
+  logs.push(log);
+  saveLogs(logs);
+};
+
+// ---- COLLEGES ----
+export const getColleges = () => JSON.parse(localStorage.getItem(KEYS.COLLEGES) || '[]');
+export const saveColleges = (cols) => localStorage.setItem(KEYS.COLLEGES, JSON.stringify(cols));
+
+export const addCollege = (college) => {
+  const cols = getColleges();
+  cols.push(college);
+  saveColleges(cols);
+};
+
+// ---- THEME ----
+export const getTheme = () => localStorage.getItem(KEYS.THEME) || 'dark';
+export const setTheme = (theme) => localStorage.setItem(KEYS.THEME, theme);
+
+// ---- HELPERS ----
+export const generateId = (prefix = 'id') =>
+  `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+export const generateAdminId = () =>
+  'CA' + Math.random().toString().substr(2, 6).toUpperCase();
+
+export const simulateOTP = () => {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // In a real app, this would be sent via email
+  console.log(`[SAPT OTP Simulation] Your OTP is: ${otp}`);
+  return otp;
+};

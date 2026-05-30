@@ -49,10 +49,8 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="p-2 bg-primary-600 rounded-xl shadow-glow">
-              <GraduationCap className="w-6 h-6 text-white" />
-            </div>
-            <span className="font-display font-bold text-xl" style={{ color: logoTextColor }}>SAPT</span>
+            <img src={isDark ? "/spark-logo1.png" : "/spark-logo2.png"} className="w-10 h-10 object-contain rounded-xl shadow-glow" alt="SPARK Logo" />
+            <span className="font-display font-bold text-xl" style={{ color: logoTextColor }}>SPARK</span>
           </Link>
 
           {/* Desktop Nav */}

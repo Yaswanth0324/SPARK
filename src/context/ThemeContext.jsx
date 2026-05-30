@@ -8,11 +8,13 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'dark') {
+    const isDark = theme === 'dark';
+    if (isDark) {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
+
     persistTheme(theme);
   }, [theme]);
 

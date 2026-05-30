@@ -1,18 +1,18 @@
 // =====================================================================
-// SAPT localStorage utility functions - Mock Database
+// SPARK localStorage utility functions - Mock Database
 // =====================================================================
 
 import { INITIAL_USERS, INITIAL_SUBMISSIONS, INITIAL_LOGS, INITIAL_COLLEGES_DATA } from './mockData';
 
 const KEYS = {
-  USERS: 'sapt_users',
-  CURRENT_USER: 'sapt_current_user',
-  SUBMISSIONS: 'sapt_submissions',
-  LOGS: 'sapt_logs',
-  COLLEGES: 'sapt_colleges',
-  REGISTERED: 'sapt_registered',
-  THEME: 'sapt_theme',
-  DB_VERSION: 'sapt_db_version',
+  USERS: 'spark_users',
+  CURRENT_USER: 'spark_current_user',
+  SUBMISSIONS: 'spark_submissions',
+  LOGS: 'spark_logs',
+  COLLEGES: 'spark_colleges',
+  REGISTERED: 'spark_registered',
+  THEME: 'spark_theme',
+  DB_VERSION: 'spark_db_version',
 };
 
 // Bump this when seed data schema changes so localStorage is refreshed
@@ -111,7 +111,7 @@ export const login = (email, password, role) => {
 
   if (seedMatch) {
     setCurrentUser(seedMatch);
-    console.log('[SAPT] Login via seed:', seedMatch.role, seedMatch.email);
+    console.log('[SPARK] Login via seed:', seedMatch.role, seedMatch.email);
     return { success: true, user: seedMatch };
   }
 
@@ -123,11 +123,11 @@ export const login = (email, password, role) => {
 
   if (user) {
     setCurrentUser(user);
-    console.log('[SAPT] Login via localStorage:', user.role, user.email);
+    console.log('[SPARK] Login via localStorage:', user.role, user.email);
     return { success: true, user };
   }
 
-  console.warn('[SAPT] Login failed for:', { e, role });
+  console.warn('[SPARK] Login failed for:', { e, role });
   return { success: false, error: 'Invalid credentials' };
 };
 
@@ -145,7 +145,7 @@ export const adminLogin = (email, password, adminId) => {
   );
   if (seedUser) {
     setCurrentUser(seedUser);
-    console.log('[SAPT] Admin login via seed data:', seedUser.role, seedUser.email);
+    console.log('[SPARK] Admin login via seed data:', seedUser.role, seedUser.email);
     return { success: true, user: seedUser };
   }
 
@@ -158,11 +158,11 @@ export const adminLogin = (email, password, adminId) => {
   );
   if (user) {
     setCurrentUser(user);
-    console.log('[SAPT] Admin login via localStorage:', user.role, user.email);
+    console.log('[SPARK] Admin login via localStorage:', user.role, user.email);
     return { success: true, user };
   }
 
-  console.warn('[SAPT] Admin login failed. Tried:', { e, a, usersCount: users.length });
+  console.warn('[SPARK] Admin login failed. Tried:', { e, a, usersCount: users.length });
   return { success: false, error: 'Invalid admin credentials' };
 };
 
@@ -238,6 +238,6 @@ export const generateAdminId = () =>
 export const simulateOTP = () => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   // In a real app, this would be sent via email
-  console.log(`[SAPT OTP Simulation] Your OTP is: ${otp}`);
+  console.log(`[SPARK OTP Simulation] Your OTP is: ${otp}`);
   return otp;
 };

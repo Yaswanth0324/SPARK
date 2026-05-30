@@ -6,20 +6,78 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { StarsDisplay } from '../../components/ui/UIComponents';
 
-const features = [
-  { icon: <Activity className="w-7 h-7" />, title: 'Activity Tracking', desc: 'Track all academic, co-curricular and extracurricular activities in one place.', color: 'from-blue-500 to-indigo-600' },
-  { icon: <Star className="w-7 h-7" />, title: 'Credits System', desc: 'Earn credits for every approved activity. Transparent and fair scoring.', color: 'from-yellow-400 to-orange-500' },
-  { icon: <Users className="w-7 h-7" />, title: 'Mentor Reviews', desc: 'Get feedback and approvals from your assigned mentor instantly.', color: 'from-emerald-500 to-teal-600' },
-  { icon: <BarChart2 className="w-7 h-7" />, title: 'Student Analytics', desc: 'Visual dashboards showing your performance and growth over time.', color: 'from-purple-500 to-pink-600' },
-  { icon: <Trophy className="w-7 h-7" />, title: 'Leaderboards', desc: 'Compete with peers and climb the department leaderboard rankings.', color: 'from-rose-500 to-red-600' },
-  { icon: <Award className="w-7 h-7" />, title: 'Achievement Stars', desc: 'Earn 1–5 stars based on total credits. Show your achievement badge.', color: 'from-amber-500 to-yellow-600' },
+const flowSteps = [
+  {
+    step: '1',
+    role: 'System Admin',
+    action: 'Platform Initialization',
+    desc: 'Registers participating colleges, creates department profiles, initializes global activity categories, and sets up baseline credit thresholds.',
+    icon: <Code2 className="w-6 h-6" />,
+    color: 'from-orange-500 to-red-600'
+  },
+  {
+    step: '2',
+    role: 'College Admin',
+    action: 'Institutional Config',
+    desc: 'Establishes local college databases, maps departmental branches, registers Head of Department (HOD) accounts, and regulates campus policy parameters.',
+    icon: <Users className="w-6 h-6" />,
+    color: 'from-amber-500 to-orange-500'
+  },
+  {
+    step: '3',
+    role: 'HOD (Head of Dept)',
+    action: 'Department Allocation',
+    desc: 'Appoints and assigns Mentors to specific student batches, monitors department-wide real-time analytics, and reviews escalated credit claims.',
+    icon: <Network className="w-6 h-6" />,
+    color: 'from-yellow-500 to-amber-600'
+  },
+  {
+    step: '4',
+    role: 'Mentor',
+    action: 'Verification & Audit',
+    desc: 'Directly audits student activity logs, reviews uploaded certificate proofs, adds constructive feedback, and approves/rejects credit scores.',
+    icon: <GraduationCap className="w-6 h-6" />,
+    color: 'from-teal-500 to-emerald-600'
+  },
+  {
+    step: '5',
+    role: 'Student',
+    action: 'Credit Accumulation',
+    desc: 'Submits co-curricular/extracurricular activity proofs, tracks real-time progress on custom interactive dashboards, earns stars, and downloads official transcripts.',
+    icon: <Trophy className="w-6 h-6" />,
+    color: 'from-blue-500 to-indigo-600'
+  }
 ];
 
-const reviews = [
-  { name: 'Priya Nair', dept: 'CS Engineering, MIT', rating: 5, text: 'SAPT has transformed how I track my achievements. Getting stars for hard work is incredibly motivating!' },
-  { name: 'Arjun Krishnan', dept: 'IT, VIT University', rating: 5, text: 'The dashboard is super clean. My mentor approves submissions in minutes. Love the UI.' },
-  { name: 'Divya Menon', dept: 'ECE, Anna University', rating: 4, text: 'Finally a system that recognizes co-curricular work. My internship got 40 credits!' },
-  { name: 'Rohan Gupta', dept: 'AI & DS, SRM', rating: 5, text: 'The leaderboard feature keeps me motivated. Reached 3 stars this semester!' },
+
+const studentTestimonials = [
+  { 
+    name: 'Priya Nair', 
+    dept: 'CS Engineering, MIT', 
+    rating: 5, 
+    text: 'SPARK has completely transformed how I track my co-curricular accomplishments. The interface is gorgeous, and seeing my star level increase keeps me incredibly motivated!' 
+  },
+  { 
+    name: 'Arjun Krishnan', 
+    dept: 'IT, VIT University', 
+    rating: 5, 
+    text: 'I love the dashboard! Submitting my certificates for hackathons and online courses is effortless, and my mentor reviews them within hours. A perfect platform!' 
+  }
+];
+
+const managementTestimonials = [
+  { 
+    name: 'Dr. Priya Sharma', 
+    dept: 'HOD, CS Engineering, MIT', 
+    rating: 5, 
+    text: 'Managing student activity credits used to be an administrative nightmare of spreadsheets and lost certificates. SPARK has streamlined the entire verification process into a seamless departmental dashboard.' 
+  },
+  { 
+    name: 'Prof. Arun Vijay', 
+    dept: 'Senior Mentor, MIT College of Eng.', 
+    rating: 5, 
+    text: 'As a mentor, SPARK allows me to stay connected with my students\' extracurricular progress. The approval workflow is highly intuitive, allowing me to review and validate submissions in just a single click.' 
+  }
 ];
 
 const HomePage = () => {
@@ -65,130 +123,123 @@ const HomePage = () => {
     ? { border: '1px solid rgba(255,255,255,0.2)', color: '#fff1e6', background: 'rgba(255,255,255,0.08)' }
     : { border: '1px solid #c2410c', color: '#c2410c', background: 'transparent' };
 
-  // ────────────────────────────────────────────────────────────────────
-
+  // ────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen" style={{ background: pageBg, color: headingColor }}>
+    <div style={{ background: pageBg, minHeight: '100vh', color: bodyTextColor }}>
       <Navbar />
 
       {/* ── HERO ──────────────────────────────────────────── */}
-      <section id="hero" className="relative pt-32 pb-24 px-4 overflow-hidden">
+      <section id="hero" className="relative pt-16 pb-2 px-4 overflow-hidden flex items-center justify-center min-h-[calc(100vh-4rem)]">
         {/* Background orbs */}
-        <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full blur-3xl animate-pulse-slow"
-          style={{ background: isDark ? 'rgba(234,88,12,0.15)' : 'rgba(234,88,12,0.08)' }} />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full blur-3xl animate-pulse-slow"
-          style={{ background: isDark ? 'rgba(245,158,11,0.1)' : 'rgba(245,158,11,0.12)' }} />
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full blur-3xl animate-pulse-slow"
+          style={{ background: isDark ? 'rgba(234,88,12,0.12)' : 'rgba(234,88,12,0.06)' }} />
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8 animate-slide-up">
-              {/* Pill badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
-                style={{ background: isDark ? 'rgba(234,88,12,0.15)' : 'rgba(234,88,12,0.1)', color: isDark ? '#fb923c' : '#c2410c', border: `1px solid ${isDark ? 'rgba(234,88,12,0.3)' : 'rgba(194,65,12,0.3)'}` }}>
-                <Star className="w-4 h-4 fill-primary-500 text-primary-500" />
-                Track. Earn. Excel.
-              </div>
+        <div className="max-w-4xl mx-auto relative z-10 text-center animate-slide-up space-y-4">
+          {/* Pill badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium mx-auto"
+            style={{ 
+              background: isDark ? 'rgba(234,88,12,0.15)' : 'rgba(234,88,12,0.1)', 
+              color: isDark ? '#fb923c' : '#c2410c', 
+              border: `1px solid ${isDark ? 'rgba(234,88,12,0.3)' : 'rgba(194,65,12,0.3)'}` 
+            }}>
+            <Star className="w-3.5 h-3.5 fill-primary-500 text-primary-500" />
+            Track. Earn. Excel.
+          </div>
 
-              <h1 className="font-display text-5xl md:text-6xl font-black leading-tight"
-                style={{ color: headingColor }}>
-                Student Activity
-                <span className="block gradient-text">Point Tracker</span>
-              </h1>
+          <h1 className="font-display text-6xl md:text-8xl font-black leading-none tracking-tight"
+            style={{ color: headingColor }}>
+            SPARK
+            <span className="block text-xl md:text-3xl mt-3.5 font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-primary-500 via-orange-500 to-amber-500">
+              Student Performance, Activities & Records Keeper
+            </span>
+          </h1>
 
-              <p className="text-lg max-w-lg leading-relaxed" style={{ color: bodyTextColor }}>
-                SAPT helps students track co-curricular activities, earn credits, and showcase achievements — all in one beautiful, intelligent platform.
-              </p>
+          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-normal" style={{ color: bodyTextColor }}>
+            SPARK helps students track co-curricular activities, earn credits, and showcase achievements — all in one beautiful, intelligent platform.
+          </p>
 
-              <div className="flex flex-wrap gap-4">
-                <button onClick={handleGetStarted} className="btn-primary text-base px-8 py-3 shadow-glow-lg">
-                  Get Started Free
-                </button>
-                <a href="#features"
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base transition-all hover:shadow-md"
-                  style={learnMoreStyle}
-                  onMouseEnter={e => {
-                    if (!isDark) e.currentTarget.style.background = 'rgba(194,65,12,0.08)';
-                  }}
-                  onMouseLeave={e => {
-                    if (!isDark) e.currentTarget.style.background = 'transparent';
-                  }}>
-                  Learn More
-                </a>
-              </div>
+          <div className="flex flex-wrap gap-4 justify-center pt-1.5">
+            <button onClick={handleGetStarted} className="btn-primary text-lg px-10 py-3.5 shadow-glow-lg transition-transform hover:scale-105">
+              Get Started Free
+            </button>
+            <a href="#flow"
+              className="inline-flex items-center gap-2 px-10 py-3.5 rounded-xl font-semibold text-lg transition-all hover:shadow-md hover:scale-105"
+              style={learnMoreStyle}
+              onMouseEnter={e => {
+                if (!isDark) e.currentTarget.style.background = 'rgba(194,65,12,0.08)';
+              }}
+              onMouseLeave={e => {
+                if (!isDark) e.currentTarget.style.background = 'transparent';
+              }}>
+              See How It Works
+            </a>
+          </div>
 
-              {/* Stats */}
-              <div className="flex items-center gap-6 pt-2">
-                {[['50+', 'Colleges'], ['10K+', 'Students'], ['1M+', 'Credits Awarded']].map(([val, label], i, arr) => (
-                  <div key={label} className="flex items-center gap-6">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold" style={{ color: headingColor }}>{val}</p>
-                      <p className="text-xs" style={{ color: subtleColor }}>{label}</p>
-                    </div>
-                    {i < arr.length - 1 && (
-                      <div className="w-px h-10" style={{ background: dividerColor }} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Dashboard Preview Card */}
-            <div className="relative animate-float hidden lg:block">
-              <div className="rounded-3xl p-6 shadow-2xl"
-                style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(12px)' }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span className="ml-2 text-xs" style={{ color: subtleColor }}>Student Dashboard</span>
+          {/* Stats centered */}
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 pt-3.5 pb-0">
+            {[['50+', 'Colleges'], ['10K+', 'Students'], ['1M+', 'Credits Awarded']].map(([val, label], i, arr) => (
+              <div key={label} className="flex items-center gap-6 animate-fade-in">
+                <div className="text-center">
+                  <p className="text-3xl md:text-4xl font-extrabold" style={{ color: headingColor }}>{val}</p>
+                  <p className="text-xs font-semibold mt-1 tracking-wide uppercase" style={{ color: isDark ? '#fb923c' : '#9a3412' }}>{label}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {[['Credits', '870'], ['Submissions', '12'], ['Approved', '9'], ['Stars', '3 ⭐']].map(([l, v]) => (
-                    <div key={l} className="rounded-xl p-3"
-                      style={{ background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(234,88,12,0.08)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(234,88,12,0.12)'}` }}>
-                      <p className="text-xs" style={{ color: subtleColor }}>{l}</p>
-                      <p className="text-xl font-bold" style={{ color: headingColor }}>{v}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="rounded-xl p-4"
-                  style={{ background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(234,88,12,0.08)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(234,88,12,0.12)'}` }}>
-                  <p className="text-xs mb-2" style={{ color: subtleColor }}>Recent Activity</p>
-                  {['Hackathon – 45 pts', 'AWS Cert – 25 pts', 'Workshop – 12 pts'].map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 py-1.5 last:border-0"
-                      style={{ borderBottom: i < 2 ? `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(234,88,12,0.12)'}` : 'none' }}>
-                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span className="text-sm" style={{ color: bodyTextColor }}>{t}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-sm" style={{ color: subtleColor }}>Achievement</span>
-                  <StarsDisplay count={3} size="sm" />
-                </div>
+                {i < arr.length - 1 && (
+                  <div className="hidden sm:block w-px h-8" style={{ background: dividerColor }} />
+                )}
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES ──────────────────────────────────────── */}
-      <section id="features" className="py-24 px-4" style={{ background: sectionAltBg }}>
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-bold" style={{ color: headingColor }}>Everything You Need</h2>
-            <p className="mt-3 text-lg" style={{ color: subtleColor }}>A complete ecosystem for student achievement tracking</p>
+      {/* ── HOW IT WORKS ──────────────────────────────────── */}
+      <section id="flow" className="py-24 px-4" style={{ background: sectionAltBg }}>
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="mb-16">
+            <h2 className="font-display text-4xl md:text-5xl font-extrabold" style={{ color: headingColor }}>How It Works</h2>
+            <p className="mt-4 text-lg max-w-xl mx-auto" style={{ color: subtleColor }}>
+              A cascading administrative flow orchestrating activity point validation and credit acquisition across all academic tiers.
+            </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f) => (
-              <div key={f.title}
-                className="group rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 cursor-default"
-                style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(8px)' }}>
-                <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${f.color} mb-4 shadow-lg text-white`}>
-                  {f.icon}
+
+          {/* Waterfall Flow Section */}
+          <div className="space-y-4 relative max-w-3xl mx-auto">
+            {flowSteps.map((step, index) => (
+              <div key={step.step} className="flex flex-col items-center">
+                {/* Box / Card */}
+                <div 
+                  className="group relative w-full rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow flex flex-col sm:flex-row items-center sm:items-start gap-5"
+                  style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(8px)' }}
+                >
+                  {/* Step Badge & Icon */}
+                  <div className={`p-4 rounded-2xl bg-gradient-to-br ${step.color} shadow-lg text-white shrink-0`}>
+                    {step.icon}
+                  </div>
+                  
+                  {/* Step Content */}
+                  <div className="flex-1 space-y-1 text-center sm:text-left">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <span className="text-xs font-bold uppercase tracking-wider text-primary-500">Step 0{step.step} · {step.action}</span>
+                      <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-primary-500/10 text-primary-500 border border-primary-500/20 max-w-max mx-auto sm:mx-0">ROLE {step.step}</span>
+                    </div>
+                    <h3 className="font-display text-xl font-bold mt-1" style={{ color: headingColor }}>
+                      {step.role}
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: bodyTextColor }}>
+                      {step.desc}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="font-display text-lg font-bold mb-2" style={{ color: headingColor }}>{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: bodyTextColor }}>{f.desc}</p>
+
+                {/* Downward Arrow (only show between steps) */}
+                {index < flowSteps.length - 1 && (
+                  <div className="py-2.5 flex flex-col items-center">
+                    {/* Custom SVG Glowing Connector Arrow */}
+                    <svg className="w-6 h-10 text-primary-500 animate-pulse drop-shadow-[0_0_8px_rgba(234,88,12,0.4)]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -219,26 +270,62 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── REVIEWS ───────────────────────────────────────── */}
+      {/* ── TESTIMONIALS ──────────────────────────────────── */}
       <section id="reviews" className="py-24 px-4" style={{ background: sectionAltBg }}>
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-bold" style={{ color: headingColor }}>What Students Say</h2>
-            <p className="mt-3 text-lg" style={{ color: subtleColor }}>Trusted by thousands of students across India</p>
+        <div className="max-w-7xl mx-auto space-y-16">
+          <div className="text-center">
+            <h2 className="font-display text-4xl font-bold" style={{ color: headingColor }}>Testimonials</h2>
+            <p className="mt-3 text-lg" style={{ color: subtleColor }}>Trusted by students and educational administrators alike</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {reviews.map((r) => (
-              <div key={r.name}
-                className="rounded-2xl p-6 transition-all hover:-translate-y-1"
-                style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(8px)' }}>
-                <StarsDisplay count={r.rating} size="sm" />
-                <p className="text-sm mt-3 mb-4 leading-relaxed" style={{ color: bodyTextColor }}>"{r.text}"</p>
-                <div className="pt-3" style={{ borderTop: cardBorder }}>
-                  <p className="font-semibold text-sm" style={{ color: headingColor }}>{r.name}</p>
-                  <p className="text-xs mt-0.5" style={{ color: subtleColor }}>{r.dept}</p>
-                </div>
+
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Part 1: Student Says */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 bg-primary-500" />
+                <h3 className="text-lg font-bold uppercase tracking-wider text-primary-500">Student Voices</h3>
               </div>
-            ))}
+              <div className="grid sm:grid-cols-2 gap-6">
+                {studentTestimonials.map((r) => (
+                  <div key={r.name}
+                    className="rounded-2xl p-6 transition-all hover:-translate-y-1 flex flex-col justify-between"
+                    style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(8px)' }}>
+                    <div>
+                      <StarsDisplay count={r.rating} size="sm" />
+                      <p className="text-sm mt-3 mb-4 leading-relaxed font-normal" style={{ color: bodyTextColor }}>"{r.text}"</p>
+                    </div>
+                    <div className="pt-3" style={{ borderTop: cardBorder }}>
+                      <p className="font-semibold text-sm" style={{ color: headingColor }}>{r.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: subtleColor }}>{r.dept}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Part 2: College Management Says */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 bg-primary-500" />
+                <h3 className="text-lg font-bold uppercase tracking-wider text-primary-500">College Management Voices</h3>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-6">
+                {managementTestimonials.map((r) => (
+                  <div key={r.name}
+                    className="rounded-2xl p-6 transition-all hover:-translate-y-1 flex flex-col justify-between"
+                    style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(8px)' }}>
+                    <div>
+                      <StarsDisplay count={r.rating} size="sm" />
+                      <p className="text-sm mt-3 mb-4 leading-relaxed font-normal" style={{ color: bodyTextColor }}>"{r.text}"</p>
+                    </div>
+                    <div className="pt-3" style={{ borderTop: cardBorder }}>
+                      <p className="font-semibold text-sm" style={{ color: headingColor }}>{r.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: subtleColor }}>{r.dept}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -249,7 +336,7 @@ const HomePage = () => {
           <div className="rounded-3xl p-12 shadow-glow"
             style={{ background: cardBg, border: `1px solid rgba(234,88,12,0.3)`, backdropFilter: 'blur(12px)' }}>
             <h2 className="font-display text-4xl font-bold mb-4" style={{ color: headingColor }}>Ready to Track Your Journey?</h2>
-            <p className="mb-8" style={{ color: bodyTextColor }}>Join thousands of students already using SAPT to showcase their achievements.</p>
+            <p className="mb-8" style={{ color: bodyTextColor }}>Join thousands of students already using SPARK to showcase their achievements.</p>
             <button onClick={handleGetStarted} className="btn-primary text-base px-10 py-4 shadow-glow-lg text-lg">
               Get Started — It's Free
             </button>
@@ -262,11 +349,11 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-10">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-primary-600 rounded-xl"><GraduationCap className="w-5 h-5 text-white" /></div>
-              <span className="font-display font-bold text-xl" style={{ color: headingColor }}>SAPT</span>
+              <img src={isDark ? "/spark-logo1.png" : "/spark-logo2.png"} className="w-8 h-8 object-contain rounded-xl" alt="SPARK Logo" />
+              <span className="font-display font-bold text-xl" style={{ color: headingColor }}>SPARK</span>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: subtleColor }}>
-              Student Activity Point Tracker — Empowering students to document, track, and celebrate their achievements.
+              Student Performance, Activities & Records Keeper — Empowering students to document, track, and celebrate their achievements.
             </p>
             <div className="flex gap-3 mt-4">
               {[ExternalLink, Code2, Network].map((Icon, i) => (
@@ -293,7 +380,7 @@ const HomePage = () => {
             <h3 className="font-semibold mb-4" style={{ color: headingColor }}>Contact</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm" style={{ color: subtleColor }}>
-                <Mail className="w-4 h-4 text-primary-500" /><span>support@sapt.edu.in</span>
+                <Mail className="w-4 h-4 text-primary-500" /><span>support@spark.edu.in</span>
               </div>
               <div className="flex items-center gap-3 text-sm" style={{ color: subtleColor }}>
                 <Phone className="w-4 h-4 text-primary-500" /><span>+91 98765 43210</span>
@@ -306,7 +393,7 @@ const HomePage = () => {
         </div>
         <div className="max-w-7xl mx-auto mt-10 pt-6 text-center text-sm"
           style={{ borderTop: `1px solid ${dividerColor}`, color: mutedColor }}>
-          © {new Date().getFullYear()} SAPT — Student Activity Point Tracker. All rights reserved.
+          © {new Date().getFullYear()} SPARK — Student Performance, Activities & Records Keeper. All rights reserved.
         </div>
       </footer>
     </div>

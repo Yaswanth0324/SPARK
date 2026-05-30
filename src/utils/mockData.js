@@ -1,5 +1,5 @@
 // =====================================================================
-// SAPT Mock Data - Pre-populated dummy data for demonstration
+// SPARK Mock Data - Pre-populated dummy data for demonstration
 // =====================================================================
 
 export const COLLEGES = [
@@ -263,7 +263,7 @@ export const INITIAL_USERS = [
     id: 'sa_001',
     role: ROLES.SYSTEM_ADMIN,
     name: 'Super Admin',
-    email: 'admin@sapt.edu',
+    email: 'admin@spark.edu',
     password: 'admin123',
     adminId: 'SA001',
   },

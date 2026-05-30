@@ -27,7 +27,7 @@ export const AdminLoginPage = () => {
         else if (role === ROLES.COLLEGE_ADMIN) navigate('/dashboard/college-admin');
         else showToast('Not an admin account.', 'error');
       } else {
-        showToast('Invalid credentials. Try: admin@sapt.edu / admin123 / SA001', 'error');
+        showToast('Invalid credentials. Try: admin@spark.edu / admin123 / SA001', 'error');
       }
       setLoading(false);
     }, 800);
@@ -47,7 +47,7 @@ export const AdminLoginPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="label-field">Admin Email</label>
-            <input type="email" className="input-field" placeholder="admin@sapt.edu" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
+            <input type="email" className="input-field" placeholder="admin@spark.edu" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
           </div>
           <div>
             <label className="label-field">Admin ID</label>
@@ -68,7 +68,7 @@ export const AdminLoginPage = () => {
         </form>
         <div className="mt-4 p-3 bg-primary-50 dark:bg-primary-950/30 rounded-xl text-xs text-primary-700 dark:text-primary-300">
           <p className="font-semibold mb-1">Demo Credentials:</p>
-          <p>System Admin: admin@sapt.edu / admin123 / SA001</p>
+          <p>System Admin: admin@spark.edu / admin123 / SA001</p>
           <p>College Admin: ramesh@mit.edu / admin123 / CA001</p>
         </div>
         <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">

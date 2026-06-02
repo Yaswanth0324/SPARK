@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Users, FileText, CheckCircle, XCircle, Eye, Download, Phone, Mail, Clock } from 'lucide-react';
-import { getUsers, getSubmissionsByMentor, updateSubmission, getTotalCredits, getLogsByStudent, getSubmissions } from '../../../utils/localStorage';
+import { Users, FileText, CheckCircle, XCircle, Eye, Download, BookOpen, Link as LinkIcon, UserCheck } from 'lucide-react';
+import { getUsers, getSubmissionsByMentor, updateSubmission, getTotalCredits, getLogsByStudent, getSubmissions, getLogsByMentor, updateLog, updateUser } from '../../../utils/localStorage';
 import { ROLES } from '../../../utils/mockData';
 import { useAuth } from '../../../context/AuthContext';
-import { StatCard, Modal, Badge, useToast, EmptyState, Avatar } from '../../../components/ui/UIComponents';
+import { Modal, Badge, useToast, EmptyState, Avatar } from '../../../components/ui/UIComponents';
 
 // =====================================================================
 // Local Sub-Components for Premium Document Previews
@@ -341,7 +341,10 @@ export const MentorStudents = () => {
                           <title>Student Performance Report - ${selected.name}</title>
                           <style>
                             body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; }
-                            .header { border-bottom: 2px solid #ea580c; padding-bottom: 10px; margin-bottom: 20px; }
+                            .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #ea580c; padding-bottom: 15px; margin-bottom: 30px; }
+                            .logo-container { display: flex; align-items: center; gap: 10px; }
+                            .logo-text { font-size: 26px; font-weight: 900; color: #ea580c; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
+                            .college-name { font-size: 14px; font-weight: 700; color: #7c2d12; text-align: right; text-transform: uppercase; letter-spacing: 0.5px; }
                             .title { font-size: 24px; font-weight: bold; }
                             .details { margin-bottom: 20px; font-size: 14px; }
                             .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -351,8 +354,11 @@ export const MentorStudents = () => {
                         </head>
                         <body>
                           <div class="header">
-                            <div class="title">Student Achievement & Submissions Report</div>
-                            <p style="margin: 5px 0 0 0; color: #ea580c; font-weight: bold;">SPARK Mentorship Platform</p>
+                            <div class="logo-container">
+                              <img src="/spark-logo1.png" style="width: 32px; height: 32px; object-fit: contain; border-radius: 8px;" />
+                              <span class="logo-text">SPARK</span>
+                            </div>
+                            <div class="college-name">${selected.college || 'SPARK Partner Institute'}</div>
                           </div>
                           <div class="details">
                             <p><strong>Student Name:</strong> ${selected.name}</p>
@@ -410,7 +416,10 @@ export const MentorStudents = () => {
                           <title>Daily Activity Logs - ${selected.name}</title>
                           <style>
                             body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; }
-                            .header { border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-bottom: 20px; }
+                            .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #ea580c; padding-bottom: 15px; margin-bottom: 30px; }
+                            .logo-container { display: flex; align-items: center; gap: 10px; }
+                            .logo-text { font-size: 26px; font-weight: 900; color: #ea580c; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
+                            .college-name { font-size: 14px; font-weight: 700; color: #7c2d12; text-align: right; text-transform: uppercase; letter-spacing: 0.5px; }
                             .title { font-size: 24px; font-weight: bold; }
                             .details { margin-bottom: 20px; font-size: 14px; }
                             .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -420,8 +429,11 @@ export const MentorStudents = () => {
                         </head>
                         <body>
                           <div class="header">
-                            <div class="title">Daily Activity Logs Report</div>
-                            <p style="margin: 5px 0 0 0; color: #3b82f6; font-weight: bold;">SPARK Mentorship Platform</p>
+                            <div class="logo-container">
+                              <img src="/spark-logo1.png" style="width: 32px; height: 32px; object-fit: contain; border-radius: 8px;" />
+                              <span class="logo-text">SPARK</span>
+                            </div>
+                            <div class="college-name">${selected.college || 'SPARK Partner Institute'}</div>
                           </div>
                           <div class="details">
                             <p><strong>Student Name:</strong> ${selected.name}</p>
@@ -710,6 +722,258 @@ export const MentorSubmissions = () => {
           return null;
         })()}
       </Modal>
+    </div>
+  );
+};
+
+// ---- Logs Page ----
+export const MentorLogs = () => {
+  const { user } = useAuth();
+  const { showToast, ToastComponent } = useToast();
+  const [logs, setLogs] = useState(() => getLogsByMentor(user.id));
+  const [reviewModal, setReviewModal] = useState(null);
+  const [review, setReview] = useState('');
+
+  const handleApprove = () => {
+    updateLog(reviewModal.id, { reviewStatus: 'approved', review });
+    setLogs(prev => prev.map(l => l.id === reviewModal.id ? { ...l, reviewStatus: 'approved', review } : l));
+    showToast('Log reviewed & approved!', 'success');
+    setReviewModal(null);
+    setReview('');
+  };
+
+  const handleReject = () => {
+    updateLog(reviewModal.id, { reviewStatus: 'rejected', review });
+    setLogs(prev => prev.map(l => l.id === reviewModal.id ? { ...l, reviewStatus: 'rejected', review } : l));
+    showToast('Log rejected.', 'error');
+    setReviewModal(null);
+    setReview('');
+  };
+
+  const statusColor = { approved: 'green', rejected: 'red', pending: 'yellow' };
+
+  return (
+    <div className="animate-fade-in">
+      {ToastComponent}
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-bold text-slate-900 dark:text-white">Student Logs</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Review daily activity logs submitted by your students</p>
+      </div>
+
+      {logs.length === 0 ? (
+        <div className="card"><EmptyState icon={<BookOpen className="w-12 h-12" />} title="No logs submitted yet" /></div>
+      ) : (
+        <div className="card p-0 overflow-hidden">
+          <table className="w-full">
+            <thead><tr>
+              <th className="table-th">Log Title</th>
+              <th className="table-th">Student</th>
+              <th className="table-th">Date</th>
+              <th className="table-th">Description</th>
+              <th className="table-th">Link</th>
+              <th className="table-th">Status</th>
+              <th className="table-th">Actions</th>
+            </tr></thead>
+            <tbody>
+              {logs.map(l => (
+                <tr key={l.id} className="hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
+                  <td className="table-td font-medium max-w-[180px] truncate">{l.title}</td>
+                  <td className="table-td">{l.studentName}</td>
+                  <td className="table-td text-slate-400 text-xs">{l.date}</td>
+                  <td className="table-td text-xs text-slate-500 dark:text-slate-400 max-w-[220px] truncate">{l.description}</td>
+                  <td className="table-td">
+                    {l.links ? (
+                      <a
+                        href={l.links}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-bold"
+                      >
+                        <LinkIcon className="w-3 h-3" /> View Link
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-400">–</span>
+                    )}
+                  </td>
+                  <td className="table-td">
+                    <Badge variant={statusColor[l.reviewStatus || 'pending']}>
+                      {l.reviewStatus || 'pending'}
+                    </Badge>
+                  </td>
+                  <td className="table-td">
+                    <button
+                      onClick={() => { setReviewModal(l); setReview(l.review || ''); }}
+                      className="btn-ghost text-xs py-1 px-2 flex items-center gap-1"
+                    >
+                      <Eye className="w-3 h-3" /> Review
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      <Modal isOpen={!!reviewModal} onClose={() => { setReviewModal(null); setReview(''); }} title="Review Log Entry">
+        {reviewModal && (
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-50 dark:bg-dark-850 rounded-xl space-y-2">
+              <p className="font-semibold text-slate-900 dark:text-white">{reviewModal.title}</p>
+              <p className="text-xs text-slate-500">{reviewModal.date} &nbsp;·&nbsp; <span className="font-medium">{reviewModal.studentName}</span></p>
+              <p className="text-sm text-slate-600 dark:text-slate-350 leading-relaxed">{reviewModal.description}</p>
+              {reviewModal.links && (
+                <a
+                  href={reviewModal.links}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 font-medium break-all"
+                >
+                  <LinkIcon className="w-3 h-3 shrink-0" /> {reviewModal.links}
+                </a>
+              )}
+            </div>
+            <div>
+              <label className="label-field">Review Comments</label>
+              <textarea
+                className="input-field h-28 resize-none"
+                placeholder="Write your review comments here (required to enable actions)..."
+                value={review}
+                onChange={e => setReview(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleApprove}
+                disabled={!review.trim()}
+                className="btn-success flex-1 justify-center py-2 text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Submit &amp; Approve
+              </button>
+              <button
+                onClick={handleReject}
+                disabled={!review.trim()}
+                className="btn-danger flex-1 justify-center py-2 text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+    </div>
+  );
+};
+
+// ---- Student Approvals Page ----
+export const MentorStudentApprovals = () => {
+  const { user } = useAuth();
+  const { showToast, ToastComponent } = useToast();
+  const [students, setStudents] = useState(() =>
+    getUsers().filter(u => u.role === ROLES.STUDENT && u.mentorId === user.id && u.status === 'pending')
+  );
+  const [approvedCount, setApprovedCount] = useState(0);
+  const [rejectedCount, setRejectedCount] = useState(0);
+
+  const handleApprove = (studentId) => {
+    updateUser(studentId, { status: 'approved' });
+    setStudents(prev => prev.filter(s => s.id !== studentId));
+    setApprovedCount(c => c + 1);
+    showToast('Student approved! They can now login.', 'success');
+  };
+
+  const handleReject = (studentId) => {
+    updateUser(studentId, { status: 'rejected' });
+    setStudents(prev => prev.filter(s => s.id !== studentId));
+    setRejectedCount(c => c + 1);
+    showToast('Student registration rejected.', 'error');
+  };
+
+  return (
+    <div className="animate-fade-in">
+      {ToastComponent}
+      <div className="mb-8 flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold text-slate-900 dark:text-white">Student Approvals</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            New student registrations awaiting your approval before they can login
+          </p>
+        </div>
+        {(approvedCount > 0 || rejectedCount > 0) && (
+          <div className="flex gap-3">
+            {approvedCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700">
+                <CheckCircle className="w-3.5 h-3.5" /> {approvedCount} approved this session
+              </span>
+            )}
+            {rejectedCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700">
+                <XCircle className="w-3.5 h-3.5" /> {rejectedCount} rejected
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {students.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            icon={<UserCheck className="w-12 h-12" />}
+            title="All caught up!"
+            description="No pending student registrations at the moment."
+          />
+        </div>
+      ) : (
+        <div className="card p-0 overflow-hidden">
+          <table className="w-full">
+            <thead><tr>
+              <th className="table-th">Student Name</th>
+              <th className="table-th">Email</th>
+              <th className="table-th">College</th>
+              <th className="table-th">Department</th>
+              <th className="table-th">Roll No.</th>
+              <th className="table-th">Status</th>
+              <th className="table-th text-right">Actions</th>
+            </tr></thead>
+            <tbody>
+              {students.map(s => (
+                <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-dark-700 transition-colors">
+                  <td className="table-td">
+                    <div className="flex items-center gap-3">
+                      <Avatar name={s.name} src={s.avatar} size="sm" />
+                      <span className="font-medium text-slate-900 dark:text-white">{s.name}</span>
+                    </div>
+                  </td>
+                  <td className="table-td text-xs text-slate-500">{s.email}</td>
+                  <td className="table-td text-xs text-slate-500 max-w-[150px] truncate">{s.college}</td>
+                  <td className="table-td text-xs text-slate-500 max-w-[150px] truncate">{s.department}</td>
+                  <td className="table-td text-slate-500 dark:text-slate-400 font-semibold">{s.rollNo || '–'}</td>
+                  <td className="table-td">
+                    <Badge variant="yellow">Pending Approval</Badge>
+                  </td>
+                  <td className="table-td text-right">
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => handleApprove(s.id)}
+                        className="btn-success text-xs py-1 px-3 flex items-center gap-1"
+                      >
+                        <CheckCircle className="w-3 h-3" /> Approve
+                      </button>
+                      <button
+                        onClick={() => handleReject(s.id)}
+                        className="btn-danger text-xs py-1 px-3 flex items-center gap-1"
+                      >
+                        <XCircle className="w-3 h-3" /> Reject
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

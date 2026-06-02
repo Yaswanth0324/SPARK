@@ -155,6 +155,7 @@ export const HODMentors = () => {
   const mentors = getUsers().filter(
     u => u.role === ROLES.MENTOR && u.college === user.college && u.department === user.department && u.status === 'approved'
   );
+  const allStudents = getUsers().filter(u => u.role === ROLES.STUDENT);
 
   const selectedStats = selected ? getMentorStats(selected.id) : null;
 
@@ -191,6 +192,7 @@ export const HODMentors = () => {
                 <th className="p-4 font-bold">Name</th>
                 <th className="p-4 font-bold">Department</th>
                 <th className="p-4 font-bold">Position</th>
+                <th className="p-4 font-bold">Students</th>
                 <th className="p-4 font-bold">Success Percentage</th>
                 <th className="p-4 font-bold text-right">Actions</th>
               </tr>
@@ -200,6 +202,7 @@ export const HODMentors = () => {
                 const stats = getMentorStats(m.id);
                 const position = m.position || (m.name.startsWith('Prof.') ? 'Professor' : m.name.startsWith('Dr.') ? 'Associate Professor' : 'Assistant Professor');
                 const rateStr = stats.rate === null ? '0%' : `${stats.rate}%`;
+                const studentCount = allStudents.filter(s => s.mentorId === m.id).length;
                 return (
                   <tr key={m.id} className="hover:bg-orange-50/30 dark:hover:bg-orange-950/10 transition-colors">
                     <td className="p-4 flex items-center gap-3">
@@ -211,6 +214,11 @@ export const HODMentors = () => {
                     </td>
                     <td className="p-4 font-semibold">{m.department || user.department}</td>
                     <td className="p-4 font-medium">{position}</td>
+                    <td className="p-4 font-semibold">
+                      <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-850 dark:bg-orange-950/30 dark:text-orange-300 animate-pulse-subtle">
+                        {studentCount}
+                      </span>
+                    </td>
                     <td className="p-4">
                       <span className={`font-bold ${stats.rate >= 70 ? 'text-emerald-600' : stats.rate >= 40 ? 'text-amber-600' : 'text-rose-600'}`}>
                         {rateStr}
@@ -241,7 +249,12 @@ export const HODMentors = () => {
               <Avatar name={selected.name} size="xl" />
               <div>
                 <p className="text-xl font-bold text-slate-900 dark:text-white">{selected.name}</p>
-                <Badge variant="green">Approved Mentor</Badge>
+                <div className="flex flex-wrap gap-2 mt-1.5">
+                  <Badge variant="green">Approved Mentor</Badge>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-300">
+                    {allStudents.filter(s => s.mentorId === selected.id).length} Students
+                  </span>
+                </div>
               </div>
             </div>
 

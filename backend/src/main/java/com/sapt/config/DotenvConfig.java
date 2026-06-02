@@ -24,13 +24,15 @@ public class DotenvConfig {
     public Dotenv dotenv() {
         Dotenv dotenv = Dotenv.configure()
                 .directory("./")          // looks for .env in backend/ root
-                .ignoreIfMissing()        // don't crash if .env is absent (CI/CD uses real env vars)
+                .ignoreIfMissing()        // don't crash if .env is absent
                 .load();
 
         // Push all .env variables into System properties so Spring picks them up
-        dotenv.entries().forEach(entry ->
-                System.setProperty(entry.getKey(), entry.getValue())
-        );
+        dotenv.entries().forEach(entry -> {
+            if (System.getProperty(entry.getKey()) == null) {
+                System.setProperty(entry.getKey(), entry.getValue());
+            }
+        });
 
         return dotenv;
     }

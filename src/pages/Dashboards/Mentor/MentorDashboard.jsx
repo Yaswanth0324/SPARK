@@ -165,16 +165,32 @@ export const MentorDashboard = () => {
               line-height: 1.5;
             }
             .header { 
-              text-align: center; 
+              display: flex; 
+              align-items: center; 
+              justify-content: space-between; 
               border-bottom: 3px solid #f97316; 
               padding-bottom: 20px; 
               margin-bottom: 35px; 
             }
-            .title { 
+            .logo-container { 
+              display: flex; 
+              align-items: center; 
+              gap: 10px; 
+            }
+            .logo-text { 
               font-size: 26px; 
-              font-weight: 800; 
-              color: #0f172a; 
-              margin: 0; 
+              font-weight: 900; 
+              color: #ea580c; 
+              font-family: 'Outfit', sans-serif; 
+              letter-spacing: -0.5px; 
+            }
+            .college-name { 
+              font-size: 14px; 
+              font-weight: 700; 
+              color: #7c2d12; 
+              text-align: right; 
+              text-transform: uppercase; 
+              letter-spacing: 0.5px; 
             }
             .subtitle { 
               font-size: 14px; 
@@ -283,8 +299,15 @@ export const MentorDashboard = () => {
         </head>
         <body>
           <div class="header">
-            <h1 class="title">${user.college}</h1>
-            <p class="subtitle">Student Placement Readiness Report | Mentorship Group of ${user.name}</p>
+            <div class="logo-container">
+              <img src="/spark-logo1.png" style="width: 32px; height: 32px; object-fit: contain; border-radius: 8px;" />
+              <span class="logo-text">SPARK</span>
+            </div>
+            <div class="college-name">${user.college}</div>
+          </div>
+          
+          <div style="margin-bottom: 25px;">
+            <p style="margin: 0; font-size: 14px; color: #ea580c; font-weight: 600;">Student Placement Readiness Report | Mentorship Group of ${user.name}</p>
             <div class="metadata">
               <span>Mentor Department: ${user.department}</span>
               <span>Generated Date: ${new Date().toLocaleDateString()}</span>

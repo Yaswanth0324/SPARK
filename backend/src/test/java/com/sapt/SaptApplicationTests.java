@@ -1,5 +1,6 @@
 package com.sapt;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +21,21 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("dev")
 class SaptApplicationTests {
+
+    static {
+        Dotenv dotenv = Dotenv.configure()
+                .directory("./")          // looks for .env in backend/ root
+                .ignoreIfMissing()        // don't crash if .env is absent
+                .load();
+
+        // Push all .env variables into System properties early so Spring picks them up
+        // before placeholder resolution
+        dotenv.entries().forEach(entry -> {
+            if (System.getProperty(entry.getKey()) == null && System.getenv(entry.getKey()) == null) {
+                System.setProperty(entry.getKey(), entry.getValue());
+            }
+        });
+    }
 
     @Test
     void contextLoads() {

@@ -17,7 +17,7 @@ import { CollegeAdminProfile } from '../pages/Dashboards/CollegeAdmin/CollegeAdm
 import { HODMentorApprovals, HODMentors } from '../pages/Dashboards/HOD/HODPages';
 import { HODDashboard } from '../pages/Dashboards/HOD/HODDashboard';
 import { HODProfile } from '../pages/Dashboards/HOD/HODProfile';
-import { MentorStudents, MentorSubmissions } from '../pages/Dashboards/Mentor/MentorPages';
+import { MentorStudents, MentorSubmissions, MentorLogs, MentorStudentApprovals } from '../pages/Dashboards/Mentor/MentorPages';
 import { MentorDashboard } from '../pages/Dashboards/Mentor/MentorDashboard';
 import { MentorProfile } from '../pages/Dashboards/Mentor/MentorProfile';
 import { StudentSubmission, StudentLogs, StudentMetrics, StudentProfile, StudentReviews } from '../pages/Dashboards/Student/StudentPages';
@@ -67,6 +67,8 @@ const AppRouter = () => (
         <Route index element={<MentorDashboard />} />
         <Route path="students" element={<MentorStudents />} />
         <Route path="submissions" element={<MentorSubmissions />} />
+        <Route path="logs" element={<MentorLogs />} />
+        <Route path="student-approvals" element={<MentorStudentApprovals />} />
         <Route path="profile" element={<MentorProfile />} />
       </Route>
 

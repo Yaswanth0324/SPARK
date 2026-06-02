@@ -209,6 +209,21 @@ export const saveLogs = (logs) => localStorage.setItem(KEYS.LOGS, JSON.stringify
 export const getLogsByStudent = (studentId) =>
   getLogs().filter(l => l.studentId === studentId).sort((a, b) => new Date(b.date) - new Date(a.date));
 
+export const getLogsByMentor = (mentorId) => {
+  const students = getUsers().filter(u => u.mentorId === mentorId);
+  const studentMap = Object.fromEntries(students.map(s => [s.id, s.name]));
+  const studentIds = new Set(students.map(s => s.id));
+  return getLogs()
+    .filter(l => studentIds.has(l.studentId))
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .map(l => ({ ...l, studentName: studentMap[l.studentId] || 'Unknown' }));
+};
+
+export const updateLog = (id, updates) => {
+  const logs = getLogs().map(l => l.id === id ? { ...l, ...updates } : l);
+  saveLogs(logs);
+};
+
 export const addLog = (log) => {
   const logs = getLogs();
   logs.push(log);

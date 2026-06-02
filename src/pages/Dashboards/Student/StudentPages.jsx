@@ -415,7 +415,79 @@ export const StudentLogs = () => {
 
       {/* Log History */}
       <div className="space-y-4">
-        <h2 className="font-semibold text-slate-800 dark:text-white">Log History ({logs.length})</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-slate-800 dark:text-white">Log History ({logs.length})</h2>
+          {logs.length > 0 && (
+            <button
+              onClick={() => {
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) return;
+                const content = `
+                  <html>
+                    <head>
+                      <title>Daily Activity Logs - ${user.name}</title>
+                      <style>
+                        body { font-family: 'Inter', sans-serif; padding: 40px; color: #1c0f00; background-color: #ffffff; }
+                        .header { border-bottom: 3px solid #ea580c; padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+                        .app-logo { font-size: 26px; font-weight: 900; color: #ea580c; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
+                        .college-name { font-size: 14px; font-weight: 700; color: #7c2d12; text-align: right; text-transform: uppercase; letter-spacing: 0.5px; }
+                        .title { font-size: 22px; font-weight: 800; color: #1c0f00; margin-bottom: 5px; }
+                        .details { margin-bottom: 25px; font-size: 14px; background: #fff7ed; padding: 15px; border-radius: 12px; border: 1px solid #fed7aa; }
+                        .details p { margin: 6px 0; color: #44170a; }
+                        .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                        .table th, .table td { border: 1px solid #fed7aa; padding: 12px; text-align: left; font-size: 13px; }
+                        .table th { background: #fff7ed; color: #7c2d12; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+                        .table td { color: #1c0f00; }
+                      </style>
+                    </head>
+                    <body>
+                      <div class="header">
+                        <div class="logo-container" style="display: flex; align-items: center; gap: 10px;">
+                          <img src="/spark-logo1.png" style="width: 32px; height: 32px; object-fit: contain; border-radius: 8px;" />
+                          <span class="logo-text" style="font-size: 26px; font-weight: 900; color: #ea580c; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">SPARK</span>
+                        </div>
+                        <div class="college-name">${user.college || 'SPARK Partner Institute'}</div>
+                      </div>
+                      <div class="title">Daily Activity Logs Report</div>
+                      <div class="details">
+                        <p><strong>Student Name:</strong> ${user.name}</p>
+                        <p><strong>Roll Number:</strong> ${user.rollNo || 'N/A'}</p>
+                        <p><strong>Department:</strong> ${user.department || 'N/A'}</p>
+                      </div>
+                      <h3 style="color: #7c2d12; font-size: 16px; margin-top: 20px;">Logged Daily Activities</h3>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 200px;">Task Title</th>
+                            <th>Detailed Description</th>
+                            <th>Resource Links</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${logs.map(l => `
+                            <tr>
+                              <td>${l.date}</td>
+                              <td><strong>${l.title}</strong></td>
+                              <td>${l.description}</td>
+                              <td>${l.links ? `<a href="${l.links}" target="_blank" style="color: #ea580c; text-decoration: underline;">${l.links}</a>` : '–'}</td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                      <script>window.onload = function() { window.print(); }</script>
+                    </body>
+                  </html>
+                `;
+                printWindow.document.write(content);
+                printWindow.document.close();
+              }}
+              className="btn-secondary text-xs gap-1"
+            >
+              <Download className="w-4 h-4" /> Export Logs
+            </button>
+          )}
+        </div>
         {logs.length === 0 ? (
           <div className="card"><EmptyState icon={<BookOpen className="w-12 h-12" />} title="No logs yet" subtitle="Start adding your daily activities" /></div>
         ) : logs.map(l => (
@@ -537,7 +609,83 @@ export const StudentMetrics = () => {
       <div className="card p-0 overflow-hidden mb-6">
         <div className="px-6 py-4 border-b border-slate-100 dark:border-dark-700 flex items-center justify-between">
           <h3 className="font-semibold text-slate-800 dark:text-white">All Submissions</h3>
-          <button onClick={() => alert('XLS Download simulated!')} className="btn-secondary text-xs gap-1">
+          <button
+            onClick={() => {
+              const printWindow = window.open('', '_blank');
+              if (!printWindow) return;
+              const content = `
+                <html>
+                  <head>
+                    <title>Submissions Report - ${user.name}</title>
+                    <style>
+                      body { font-family: 'Inter', sans-serif; padding: 40px; color: #1c0f00; background-color: #ffffff; }
+                      .header { border-bottom: 3px solid #ea580c; padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+                      .app-logo { font-size: 26px; font-weight: 900; color: #ea580c; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
+                      .college-name { font-size: 14px; font-weight: 700; color: #7c2d12; text-align: right; text-transform: uppercase; letter-spacing: 0.5px; }
+                      .title { font-size: 22px; font-weight: 800; color: #1c0f00; margin-bottom: 5px; }
+                      .details { margin-bottom: 25px; font-size: 14px; background: #fff7ed; padding: 15px; border-radius: 12px; border: 1px solid #fed7aa; }
+                      .details p { margin: 6px 0; color: #44170a; }
+                      .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                      .table th, .table td { border: 1px solid #fed7aa; padding: 12px; text-align: left; font-size: 13px; }
+                      .table th { background: #fff7ed; color: #7c2d12; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+                      .table td { color: #1c0f00; }
+                      .badge { display: inline-block; padding: 3px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; border-radius: 999px; }
+                      .badge-approved { background-color: #d1fae5; color: #065f46; }
+                      .badge-pending { background-color: #fef3c7; color: #92400e; }
+                      .badge-rejected { background-color: #fee2e2; color: #991b1b; }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="header">
+                      <div class="logo-container" style="display: flex; align-items: center; gap: 10px;">
+                        <img src="/spark-logo1.png" style="width: 32px; height: 32px; object-fit: contain; border-radius: 8px;" />
+                        <span class="logo-text" style="font-size: 26px; font-weight: 900; color: #ea580c; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">SPARK</span>
+                      </div>
+                      <div class="college-name">${user.college || 'SPARK Partner Institute'}</div>
+                    </div>
+                    <div class="title">Student Achievement & Submissions Report</div>
+                    <div class="details">
+                      <p><strong>Student Name:</strong> ${user.name}</p>
+                      <p><strong>Roll Number:</strong> ${user.rollNo || 'N/A'}</p>
+                      <p><strong>Department:</strong> ${user.department || 'N/A'}</p>
+                      <p><strong>Total Approved Credits:</strong> ${totalCredits} Points</p>
+                    </div>
+                    <h3 style="color: #7c2d12; font-size: 16px; margin-top: 20px;">All Submissions</h3>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Category</th>
+                          <th>Achievement Type</th>
+                          <th>Status</th>
+                          <th>Credits</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${submissions.map(s => {
+                          const badgeClass = s.status === 'approved' ? 'badge-approved' : s.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+                          return `
+                            <tr>
+                              <td><strong>${s.title}</strong></td>
+                              <td>${s.type}</td>
+                              <td>${s.achievementType || '–'}</td>
+                              <td><span class="badge ${badgeClass}">${s.status}</span></td>
+                              <td style="font-weight: bold; color: #ea580c;">${s.credits || (s.suggestedCredits ? `~${s.suggestedCredits}` : '–')}</td>
+                            </tr>
+                          `;
+                        }).join('')}
+                        ${submissions.length === 0 ? '<tr><td colspan="5" style="text-align: center;">No submissions uploaded yet.</td></tr>' : ''}
+                      </tbody>
+                    </table>
+                    <script>window.onload = function() { window.print(); }</script>
+                  </body>
+                </html>
+              `;
+              printWindow.document.write(content);
+              printWindow.document.close();
+            }}
+            className="btn-secondary text-xs gap-1"
+          >
             <Download className="w-4 h-4" /> Export
           </button>
         </div>

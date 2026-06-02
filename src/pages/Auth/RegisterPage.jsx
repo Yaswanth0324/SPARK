@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GraduationCap, Eye, EyeOff, CheckCircle, Upload } from 'lucide-react';
 import { useToast } from '../../components/ui/UIComponents';
 import { COLLEGES, DEPARTMENTS, ROLES } from '../../utils/mockData';
-import { addUser, isEmailRegistered, setRegistered, generateId, simulateOTP, getUsers } from '../../utils/localStorage';
+import { addUser, isEmailRegistered, setRegistered, generateId, simulateOTP, getUsers, getDepartmentsByCollege, addDepartmentToCollege } from '../../utils/localStorage';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const RegisterPage = () => {
   const [otpVerified, setOtpVerified] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [customDept, setCustomDept] = useState('');
   const [form, setForm] = useState({
     college: '', department: '', role: '',
     email: '', name: '', mentorName: '',
@@ -51,8 +52,18 @@ const RegisterPage = () => {
     if (form.password !== form.confirmPassword) { showToast('Passwords do not match', 'error'); return; }
     if (form.password.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
 
+    const deptToUse = form.department === 'Other' ? customDept.trim() : form.department;
+    if (form.department === 'Other' && !deptToUse) {
+      showToast('Please enter a department name', 'error');
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
+      if (form.department === 'Other') {
+        addDepartmentToCollege(form.college, deptToUse);
+      }
+
       const newUser = {
         id: generateId('user'),
         role: form.role,
@@ -60,8 +71,8 @@ const RegisterPage = () => {
         email: form.email,
         password: form.password,
         college: form.college,
-        department: form.department,
-        status: form.role === ROLES.STUDENT ? 'approved' : 'pending',
+        department: deptToUse,
+        status: 'pending',  // Mentor must approve before student can login
         phone: '',
         ...(form.role === ROLES.STUDENT && { mentorName: form.mentorName, mentorId: mentors.find(m => m.name === form.mentorName)?.id || '' }),
         ...(form.role === ROLES.HOD && { hodId: form.email }),
@@ -69,8 +80,11 @@ const RegisterPage = () => {
       };
       addUser(newUser);
       setRegistered();
-      showToast('Registration successful! Please login.', 'success');
-      setTimeout(() => navigate('/login'), 1500);
+      const successMsg = form.role === ROLES.STUDENT
+        ? 'Registration submitted! Your mentor must approve your account before you can login.'
+        : 'Registration successful! Please login.';
+      showToast(successMsg, 'success', 5000);
+      setTimeout(() => navigate('/login'), 2000);
       setLoading(false);
     }, 800);
   };
@@ -92,18 +106,38 @@ const RegisterPage = () => {
           <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="label-field">College Name</label>
-              <select className="select-field" value={form.college} onChange={e => set('college', e.target.value)} required>
+              <select className="select-field" value={form.college} onChange={e => {
+                setForm(f => ({ ...f, college: e.target.value, department: '' }));
+                setCustomDept('');
+              }} required>
                 <option value="">Select College</option>
                 {COLLEGES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div>
               <label className="label-field">Department</label>
-              <select className="select-field" value={form.department} onChange={e => set('department', e.target.value)} required>
+              <select className="select-field" value={form.department} onChange={e => {
+                set('department', e.target.value);
+                if (e.target.value !== 'Other') setCustomDept('');
+              }} required>
                 <option value="">Select Department</option>
-                {DEPARTMENTS.map(d => <option key={d}>{d}</option>)}
+                {getDepartmentsByCollege(form.college).map(d => <option key={d} value={d}>{d}</option>)}
+                {form.college && <option value="Other">Other (Add New Department)</option>}
               </select>
             </div>
+            {form.department === 'Other' && (
+              <div className="animate-fadeIn">
+                <label className="label-field text-primary-600 dark:text-primary-400">New Department Name</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  placeholder="Enter new department name"
+                  value={customDept}
+                  onChange={e => setCustomDept(e.target.value)}
+                  required
+                />
+              </div>
+            )}
             <div>
               <label className="label-field">Role</label>
               <select className="select-field" value={form.role} onChange={e => set('role', e.target.value)} required>

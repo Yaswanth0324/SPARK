@@ -261,6 +261,17 @@ const LoginPage = () => {
     setTimeout(() => {
       const res = loginUser(form.email, form.password, form.role);
       if (res.success) {
+        // Block pending / rejected students
+        if (res.user.role === ROLES.STUDENT && res.user.status === 'pending') {
+          showToast('Your account is pending mentor approval. Please wait for your mentor to approve your registration.', 'warning', 6000);
+          setLoading(false);
+          return;
+        }
+        if (res.user.role === ROLES.STUDENT && res.user.status === 'rejected') {
+          showToast('Your registration has been rejected by your mentor. Please contact your mentor or register again.', 'error', 6000);
+          setLoading(false);
+          return;
+        }
         login(res.user);
         const role = res.user.role;
         if (role === ROLES.HOD) navigate('/dashboard/hod');

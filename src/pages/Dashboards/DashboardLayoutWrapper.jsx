@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Building2, UserPlus, Users, CheckSquare, BookOpen, FileText, UploadCloud, BarChart2, User, LayoutDashboard } from 'lucide-react';
+import { Building2, UserPlus, Users, CheckSquare, BookOpen, FileText, UploadCloud, BarChart2, User, LayoutDashboard, UserCheck } from 'lucide-react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { ROLES } from '../../utils/mockData';
@@ -27,6 +27,8 @@ const roleLinks = {
     { to: '/dashboard/mentor', end: true, icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
     { to: '/dashboard/mentor/students', icon: <Users className="w-5 h-5" />, label: 'Students' },
     { to: '/dashboard/mentor/submissions', icon: <FileText className="w-5 h-5" />, label: 'Submissions' },
+    { to: '/dashboard/mentor/logs', icon: <BookOpen className="w-5 h-5" />, label: 'Student Logs' },
+    { to: '/dashboard/mentor/student-approvals', icon: <UserCheck className="w-5 h-5" />, label: 'Student Approvals' },
     { to: '/dashboard/mentor/profile', icon: <User className="w-5 h-5" />, label: 'Profile' },
   ],
   [ROLES.STUDENT]: [

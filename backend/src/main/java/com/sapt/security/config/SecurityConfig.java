@@ -43,6 +43,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Main security filter chain configuration.
@@ -76,22 +77,13 @@ public class SecurityConfig {
     }
 
     /**
-     * Password encoder — BCrypt with default strength (10).
-     * Used for hashing passwords before storing in DB.
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    /**
      * Authentication provider — uses UserDetailsService + PasswordEncoder.
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
 
